@@ -2,6 +2,7 @@ package com.example.listycitylab3;
 
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -12,7 +13,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class MainActivity extends AppCompatActivity implements AddCityFragment.AddCityDialogListener {
+public class MainActivity extends AppCompatActivity implements AddCityFragment.AddCityDialogListener, EditCityFragment.EditCityDialogListener {
 
     private ArrayList<City> dataList;
     private ListView cityList;
@@ -22,6 +23,18 @@ public class MainActivity extends AppCompatActivity implements AddCityFragment.A
     public void addCity(City city) {
         cityAdapter.add(city);
         cityAdapter.notifyDataSetChanged();
+    }
+
+    public void editCity(City cityOriginal, City cityNew) {
+        int cityPos = cityAdapter.getPosition(cityOriginal);
+        cityAdapter.insert(cityNew, cityPos);
+        cityAdapter.remove(cityOriginal);
+        cityAdapter.notifyDataSetChanged();
+    }
+
+    public City getSelectedCity() {
+        int selectedPosition = cityList.getCheckedItemPosition();
+        return (City) cityList.getItemAtPosition(selectedPosition);
     }
 
     @Override
@@ -38,6 +51,9 @@ public class MainActivity extends AppCompatActivity implements AddCityFragment.A
         }
         
         cityList = findViewById(R.id.city_list);
+
+        cityList.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+
         cityAdapter = new CityArrayAdapter(this, dataList);
         cityList.setAdapter(cityAdapter);
 
@@ -48,5 +64,13 @@ public class MainActivity extends AppCompatActivity implements AddCityFragment.A
                 new AddCityFragment().show(getSupportFragmentManager(), "Add City");
             }
         });
+
+        cityList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                new EditCityFragment().show(getSupportFragmentManager(), "Edit City");
+            }
+        });
+
     }
 }
